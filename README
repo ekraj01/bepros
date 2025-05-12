@@ -1,0 +1,253 @@
+BePros Nepal Portfolio Website
+Overview
+BePros Nepal is a multi-service company offering 13 services, including Software Development, Web Development, Digital Marketing, and more. This project is a full-stack dynamic portfolio website with a frontend for showcasing services, portfolio, blogs, and testimonials, and a backend admin panel for content management. It is built using PHP, MySQL, HTML, CSS (with Bootstrap for responsiveness), and runs locally via XAMPP.
+Features
+
+Frontend Pages:
+Home: Hero banner, service overview, featured portfolio, testimonials, and CTAs.
+About Us: Company information.
+Services: List of 13 services with icons, descriptions, and "Read More" links.
+Portfolio: Filterable project showcase with details page.
+Blog: Articles with title, featured image, and full post view.
+Testimonials: Client quotes with images and company details.
+Contact: Form (stores submissions in DB), Google Maps embed, social media links.
+
+
+Admin Panel:
+Secure login with CAPTCHA verification.
+Dashboard with stats (projects, services, blogs, messages).
+Modules: Manage services, portfolio, blogs, testimonials, and contact inquiries.
+Admin management (add, edit, delete admins; super_admin role required).
+
+
+Database: MySQL (bepros_portfolio) with tables for admins, services, projects, blogs, testimonials, and contacts.
+Security: PDO prepared statements, password hashing, input sanitization, session-based authentication.
+Extras: Pagination, search, TinyMCE for blog editing, responsive design.
+
+Prerequisites
+
+XAMPP: Version with PHP 8.2.12+ and MySQL/MariaDB 10.4.32+.
+Browser: Chrome, Firefox, or Edge for testing.
+Text Editor: VS Code, Notepad++, or similar for editing code.
+
+Setup Instructions
+
+Install XAMPP:
+
+Download and install XAMPP from apachefriends.org.
+Start Apache and MySQL in the XAMPP Control Panel.
+
+
+Clone or Copy Project Files:
+
+Place the project folder in C:\xampp\htdocs\.
+Example: C:\xampp\htdocs\bepros\.
+Ensure the folder structure matches the one below.
+
+
+Set Up the Database:
+
+Open http://localhost/phpmyadmin.
+Create a database named bepros_portfolio.
+Import the provided SQL dump (bepros_portfolio.sql) from the project root:
+Click bepros_portfolio database.
+Go to Import tab, choose bepros_portfolio.sql, and click Go.
+
+
+Alternatively, run the SQL commands manually to create tables (admins, services, projects, blogs, testimonials, contacts).
+
+
+Configure Database Connection:
+
+Ensure config/db.php exists in htdocs/bepros/config/ with:<?php
+class Database {
+    private $host = 'localhost';
+    private $db_name = 'bepros_portfolio';
+    private $username = 'root';
+    private $password = '';
+    public $pdo;
+
+    public function connect() {
+        try {
+            $this->pdo = new PDO("mysql:host=$this->host;dbname=$this->db_name", $this->username, $this->password);
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        } catch(PDOException $e) {
+            die("Connection Error: " . $e->getMessage());
+        }
+        return $this->pdo;
+    }
+}
+$db = new Database();
+$pdo = $db->connect();
+?>
+
+
+
+
+Access the Website:
+
+Frontend: http://localhost/bepros/
+Admin Panel: http://localhost/bepros/admin/login.php
+
+
+Admin Login:
+
+Default admin credentials (from SQL dump):
+Email: admin@bepros.com
+Password: Unknown (reset required; see below).
+Role: super_admin
+
+
+Second admin:
+Email: admin1@admin.com
+Password: Unknown (reset required).
+Role: admin
+
+
+To reset a password:
+Generate a hash for a new password (e.g., BePros2025!):<?php
+$new_password = 'BePros2025!';
+$hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+echo $hashed_password;
+?>
+
+Save as generate_hash.php in htdocs/bepros/admin/, run http://localhost/bepros/admin/generate_hash.php, and copy the hash.
+Update the admins table in phpMyAdmin:UPDATE admins
+SET password = 'your_hash_here'
+WHERE email = 'admin@bepros.com';
+
+
+Log in with:
+Email: admin@bepros.com
+Password: BePros2025!
+CAPTCHA: Enter the displayed code.
+
+
+
+
+
+
+
+File Structure
+htdocs/
+└── bepros/
+    ├── index.php              # Home page
+    ├── about.php             # About Us page
+    ├── services.php          # Services page
+    ├── portfolio.php         # Portfolio page
+    ├── blog.php              # Blog page
+    ├── testimonials.php      # Testimonials page
+    ├── contact.php           # Contact page
+    ├── admin/
+    │   ├── login.php         # Admin login
+    │   ├── dashboard.php     # Admin dashboard
+    │   ├── admins/
+    │   │   ├── manage_admins.php  # Manage admins
+    │   │   ├── edit.php      # Edit admin
+    │   ├── services/         # Service management
+    │   ├── projects/         # Project management
+    │   ├── blog/             # Blog management
+    │   ├── testimonials/     # Testimonial management
+    │   ├── messages/         # Contact inquiries
+    │   ├── logout.php        # Admin logout
+    ├── config/
+    │   └── db.php            # Database connection
+    ├── assets/
+    │   ├── css/              # Custom CSS
+    │   ├── js/               # Custom JavaScript
+    │   ├── images/           # Logos, icons, etc.
+    │   └── uploads/          # Uploaded images (projects, blogs, etc.)
+
+Database Schema
+
+Database: bepros_portfolio
+Tables:
+admins: id, email, password, role, created_at
+services: id, title, description, icon, is_visible
+projects: id, title, description, image, tech_stack, client, category, is_published
+blogs: id, title, content, featured_image, tags, created_at, status
+testimonials: id, name, company, quote, photo, is_visible
+contacts: id, name, email, message, created_at, is_read
+
+
+
+Admin Panel Usage
+
+Login: Access http://localhost/bepros/admin/login.php. Enter email, password, and CAPTCHA.
+Dashboard: View stats (total projects, services, blogs, messages).
+Modules:
+Services: Add/edit/delete services, toggle visibility.
+Portfolio: Manage projects (title, description, images, tech stack).
+Blogs: Create/edit articles with TinyMCE editor.
+Testimonials: Add/edit client quotes and images.
+Messages: View/delete/export contact form submissions.
+Admins: Add/edit/delete admins (super_admin only).
+
+
+Logout: Use logout.php to end session.
+
+Security Considerations
+
+Authentication: Session-based with $_SESSION checks.
+Password Hashing: Uses password_hash() with bcrypt.
+Input Sanitization: filter_var() for emails, strings, and numbers.
+Database: PDO prepared statements to prevent SQL injection.
+CAPTCHA: Prevents brute-force login attempts.
+Recommendations:
+Delete temporary scripts (e.g., generate_hash.php) after use.
+Restrict admin/ folder access in production (e.g., .htaccess).
+Regularly back up the database.
+
+
+
+Troubleshooting
+
+Blank Page:
+Enable error reporting in PHP scripts:ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+
+Check C:\xampp\php\logs\php_error_log for errors.
+
+
+Database Connection Error:
+Verify config/db.php credentials and database existence.
+Ensure MySQL is running in XAMPP.
+
+
+Login Issues:
+Check admins table for correct email/password hash.
+Verify CAPTCHA input matches displayed code.
+
+
+404 Errors:
+Confirm files are in correct folders (htdocs/bepros/).
+Check URLs (e.g., http://localhost/bepros/admin/login.php).
+
+
+PHP Not Executing:
+Test with http://localhost/phpinfo.php (create phpinfo.php with <?php phpinfo(); ?>).
+Reinstall XAMPP if PHP is misconfigured.
+
+
+
+Contributing
+
+Fork the repository (if hosted on Git).
+Create feature branches for changes.
+Test locally with XAMPP.
+Submit pull requests with clear descriptions.
+
+License
+This project is for internal use by BePros Nepal. Contact the project owner for licensing details.
+Contact
+For issues or questions, contact the development team at admin@bepros.com.
+
+================================
+LOGIN PASSWORD
+
+Email: admin@bepros.com
+Password: BePros2025!
+CAPTCHA: Enter the code shown on login.php.
